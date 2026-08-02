@@ -1,4 +1,4 @@
-## OSSP Practical - Step-by-Step (macOS)
+## OSSP SKILL 1 - Step-by-Step (macOS)
 Part 1: C Program using fork(), exec(), and wait()
 Step 1: Open Terminal
 Press ⌘ + Space, type Terminal, and press Enter.
