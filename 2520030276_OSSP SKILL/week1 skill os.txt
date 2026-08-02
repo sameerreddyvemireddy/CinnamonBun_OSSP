@@ -1,0 +1,130 @@
+## OSSP Practical - Step-by-Step (macOS)
+Part 1: C Program using fork(), exec(), and wait()
+Step 1: Open Terminal
+Press ⌘ + Space, type Terminal, and press Enter.
+
+Step 2: Go to the Desktop
+cd ~/Desktop
+
+Check your current location:
+pwd
+Observation:/Users/your_username/Desktop
+Step 3: Create a C file
+nano forkexec.c
+Paste the following code:
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
+int main()
+{
+    char command[100];
+
+    printf("Enter Linux command: ");
+    scanf("%s", command);
+
+    pid_t pid = fork();
+
+    if(pid < 0)
+    {
+        printf("Fork failed\n");
+        return 1;
+    }
+    else if(pid == 0)
+    {
+        printf("\nChild Process\n");
+        printf("Child PID : %d\n", getpid());
+
+        execlp(command, command, NULL);
+
+        printf("Command execution failed\n");
+    }
+    else
+    {
+        printf("\nParent Process\n");
+        printf("Parent PID : %d\n", getpid());
+
+        wait(NULL);
+
+        printf("Child process completed.\n");
+    }
+
+    return 0;
+}
+
+Step 4: Save the file
+Ctrl + O
+Enter
+Ctrl + X
+Step 5: Compile the program
+gcc forkexec.c -o forkexec
+Observation
+If there are no errors, nothing is displayed.
+Step 6: Run the program
+./forkexec
+When prompted:
+Enter Linux command:
+ls
+Example Output:
+Enter Linux command: ls
+
+Parent Process
+Parent PID : 52928
+
+Child Process
+Child PID : 52929
+
+Desktop
+Documents
+Downloads
+
+Child process completed.
+Part 2: Operating System Commands
+1. Display Operating System Information
+Command:
+uname -a
+Example Output:
+Darwin Sameer-Reddy.local
+Darwin Kernel Version ...
+arm64
+2. Display CPU Information
+Run
+system_profiler SPHardwareDataType
+3. Display Storage Information
+diskutil list
+Example Output:
+/dev/disk3
+
+Apple_APFS
+
+Macintosh HD
+
+Data
+Observation
+Displays:
+Storage devices
+Disk partitions
+Partition sizes
+4. Display Running Processes
+ps
+Example Output:
+PID TTY TIME CMD
+
+521 zsh
+
+845 ps
+5. Display Live System Usage
+top
+To exit:
+q
+| Command                              | Purpose                      | Observation                                     |
+| ------------------------------------ | ---------------------------- | ----------------------------------------------- |
+| `./forkexec`                         | Execute C program            | Creates child process and executes user command |
+| `uname -a`                           | Operating System Information | Displays kernel version and system architecture |
+| `system_profiler SPHardwareDataType` | CPU Information              | Displays Apple chip, cores, and RAM             |
+| `diskutil list`                      | Storage Information          | Lists disks and partitions                      |
+| `ps`                                 | Process Information          | Shows active processes with PIDs                |
+| `ps -ef`                             | Detailed Process Information | Displays all running processes                  |
+| `top`                                | Live System Monitor          | Shows real-time CPU, memory, and process usage  |
