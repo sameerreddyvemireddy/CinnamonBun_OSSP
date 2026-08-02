@@ -1,0 +1,106 @@
+## OSSP (Operating Systems and Systems Programming)
+SKILL 1 - MAC TERMINAL STEP BY STEP
+
+STEP 1: Open Terminal
+1. Press Command + Space.
+2. Type Terminal.
+3. Press Enter.
+
+STEP 2: Check Homebrew
+brew --version
+
+STEP 3: Install GCC
+gcc --version
+Verify:
+gcc --version
+
+STEP 4: Install Git
+git --version
+Verify:
+git --version
+
+STEP 5: Configure Git
+git config --global user.name "Your Name"
+git config --global user.email "yourmail@gmail.com"
+git config --list
+
+STEP 6: Create Project Folder
+cd ~/Desktop
+mkdir OSSP
+cd OSSP
+
+STEP 7: Create Project Structure
+mkdir src include bin obj docs
+ls
+
+STEP 8: Initialize Git Repository
+git init
+ls -a
+
+STEP 9: Create C Program
+cd src
+touch main.c
+nano main.c
+
+Paste:
+#include <stdio.h>
+
+int main()
+{
+    printf("Hello OSSP\n");
+    return 0;
+}
+
+Save: Ctrl+O, Enter
+Exit: Ctrl+X
+
+STEP 10: Compile and Run
+gcc main.c -o main
+./main
+
+STEP 11: Shell Commands
+echo $SHELL
+pwd
+ls
+ls -la
+whoami
+uname -a
+
+STEP 12: Create Makefile
+cd ..
+touch Makefile
+nano Makefile
+
+Paste:
+all:
+<TAB>gcc src/main.c -o bin/main
+
+run:
+<TAB>./bin/main
+
+clean:
+<TAB>rm -f bin/main
+
+Save and Exit.
+
+STEP 13: Run Makefile
+make
+make run
+make clean
+
+STEP 14: Git Commit
+git status
+git add .
+git commit -m "Initial OSSP project setup"
+
+OBSERVATION:
+1. Homebrew installed successfully.
+2. GCC installed successfully.
+3. Git configured successfully.
+4. Project structure created.
+5. Git repository initialized.
+6. C program compiled without errors.
+7. Program output:
+Hello OSSP
+8. Makefile compiled and executed successfully.
+9. Initial Git commit completed.
