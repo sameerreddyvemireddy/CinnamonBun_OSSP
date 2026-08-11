@@ -1,0 +1,477 @@
+============================================================
+OSSP PRACTICAL
+QUESTION 1
+============================================================
+
+Q1(a) C PROGRAM USING fork(), exec() AND wait()
+------------------------------------------------------------
+
+AIM:
+
+To develop a C program that accepts a Linux command from the user,
+creates a child process using fork(), executes the command using
+exec(), makes the parent process wait using wait(), and displays
+the Parent PID and Child PID.
+
+
+REQUIREMENTS:
+
+1. fork()
+2. exec()
+3. wait()
+4. Process ID (PID)
+
+
+STEP-BY-STEP PROCESS:
+
+STEP 1: Open Terminal
+
+Press Command + Space.
+
+Type:
+
+Terminal
+
+Press Enter.
+
+
+STEP 2: Go to the existing OSSP practical folder
+
+Type:
+
+cd Desktop
+
+Press Enter.
+
+Then type:
+
+cd OSSP
+
+Press Enter.
+
+Then type:
+
+cd "2520030276_OSSP PRACTICAL"
+
+Press Enter.
+
+
+STEP 3: Check the current location
+
+Type:
+
+pwd
+
+Expected output:
+
+/Users/vsameerreddy/Desktop/OSSP/2520030276_OSSP PRACTICAL
+
+
+STEP 4: Check the files
+
+Type:
+
+ls
+
+Do not delete any existing files.
+
+
+STEP 5: Create the C program
+
+Type:
+
+nano command_exec.c
+
+Press Enter.
+
+
+STEP 6: Enter the following C program
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
+int main()
+{
+    char command[100];
+
+    printf("Enter a command: ");
+    scanf("%s", command);
+
+    pid_t pid = fork();
+
+    if (pid < 0)
+    {
+        perror("fork failed");
+        return 1;
+    }
+
+    if (pid == 0)
+    {
+        printf("Child PID: %d\n", getpid());
+        printf("Child is executing the command...\n");
+
+        execlp(command, command, (char *)NULL);
+
+        perror("exec failed");
+        exit(1);
+    }
+    else
+    {
+        printf("Parent PID: %d\n", getpid());
+        printf("Parent is waiting for child...\n");
+
+        wait(NULL);
+
+        printf("Child process completed.\n");
+    }
+
+    return 0;
+}
+
+
+STEP 7: Save the program
+
+Press:
+
+Control + O
+
+Press Enter.
+
+Then press:
+
+Control + X
+
+
+STEP 8: Compile the program
+
+Type:
+
+gcc command_exec.c -o command_exec
+
+Press Enter.
+
+If there is no error, compilation is successful.
+
+
+STEP 9: Run the program
+
+Type:
+
+./command_exec
+
+Press Enter.
+
+It will display:
+
+Enter a command:
+
+Type:
+
+ls
+
+Press Enter.
+
+
+EXPECTED OUTPUT:
+
+Enter a command: ls
+Parent PID: 12345
+Parent is waiting for child...
+Child PID: 12346
+Child is executing the command...
+command_exec
+command_exec.c
+
+NOTE:
+The PID numbers will be different on your Mac.
+
+
+STEP 10: Test another command
+
+Type:
+
+./command_exec
+
+Enter:
+
+pwd
+
+Press Enter.
+
+
+STEP 11: Test another command
+
+Type:
+
+./command_exec
+
+Enter:
+
+date
+
+Press Enter.
+
+
+OBSERVATION:
+
+The fork() system call creates a child process. The child process
+executes the entered command using execlp(). The parent process
+waits for the child process using wait().
+
+
+RESULT:
+
+The command was successfully executed using fork(), exec() and
+wait() system calls.
+
+
+============================================================
+Q1(b) HARDWARE RESOURCES AND OPERATING SYSTEM SERVICES
+============================================================
+
+AIM:
+
+To investigate the relationship between hardware resources and
+operating system services and understand how the operating system
+abstracts CPU, memory, storage and I/O devices.
+
+
+IMPORTANT:
+
+The question mentions Linux commands:
+
+uname
+lscpu
+lsblk
+ps
+top
+
+Since we are using macOS, lscpu and lsblk are not normally
+available on Mac.
+
+Therefore, use the following Mac equivalents:
+
+Linux command                 Mac command
+------------------------------------------------
+uname                         uname -a
+lscpu                         sysctl -a | grep machdep.cpu
+lsblk                         diskutil list
+ps                            ps aux
+top                           top
+
+
+STEP 1: Go to the OSSP practical folder
+
+Type:
+
+cd Desktop
+
+Then:
+
+cd OSSP
+
+Then:
+
+cd "2520030276_OSSP PRACTICAL"
+
+
+STEP 2: Check operating system information
+
+Type:
+
+uname -a
+
+Press Enter.
+
+PURPOSE:
+
+The uname command displays operating system, kernel and machine
+architecture information.
+
+
+STEP 3: Check CPU information
+
+Type:
+
+sysctl -a | grep machdep.cpu
+
+Press Enter.
+
+PURPOSE:
+
+This displays CPU-related information.
+
+
+STEP 4: Check the number of CPUs
+
+Type:
+
+sysctl -n hw.ncpu
+
+Press Enter.
+
+PURPOSE:
+
+This displays the number of logical CPUs available to the system.
+
+
+STEP 5: Check memory information
+
+Type:
+
+sysctl -n hw.memsize
+
+Press Enter.
+
+PURPOSE:
+
+This displays the physical memory size in bytes.
+
+
+STEP 6: Check storage devices
+
+Type:
+
+diskutil list
+
+Press Enter.
+
+PURPOSE:
+
+This displays disks, partitions and storage devices.
+
+
+STEP 7: Display running processes
+
+Type:
+
+ps aux
+
+Press Enter.
+
+PURPOSE:
+
+This displays currently running processes.
+
+Important columns include:
+
+PID     = Process ID
+%CPU    = CPU usage
+%MEM    = Memory usage
+COMMAND = Process/command name
+
+
+STEP 8: Monitor processes continuously
+
+Type:
+
+top
+
+Press Enter.
+
+PURPOSE:
+
+The top command continuously displays CPU usage, memory usage
+and running processes.
+
+
+STEP 9: Exit top
+
+Press:
+
+Control + C
+
+
+COMMANDS USED:
+
+uname -a
+
+sysctl -a | grep machdep.cpu
+
+sysctl -n hw.ncpu
+
+sysctl -n hw.memsize
+
+diskutil list
+
+ps aux
+
+top
+
+
+OBSERVATION:
+
+1. CPU:
+
+The operating system manages CPU resources by scheduling
+processes and allocating CPU time to different processes.
+
+
+2. MEMORY:
+
+The operating system manages RAM and provides memory space
+for running processes.
+
+
+3. STORAGE:
+
+The operating system manages storage devices and filesystems.
+Applications access files through operating system services
+instead of directly controlling storage hardware.
+
+
+4. I/O DEVICES:
+
+The operating system manages input and output devices such
+as keyboard, mouse, display, disk and network devices through
+device drivers and operating system services.
+
+
+5. PROCESSES:
+
+The operating system creates, schedules and terminates
+processes. The ps command displays processes and the top
+command continuously monitors process activity.
+
+
+CONCLUSION:
+
+The operating system acts as an interface between applications
+and hardware. It abstracts CPU, memory, storage and I/O devices
+and provides controlled services to applications.
+
+
+============================================================
+END OF QUESTION 1
+============================================================
+
+
+QUESTION 1 SUMMARY:
+
+Q1(a) = fork() + exec() + wait()
+
+Q1(b) = uname + CPU + storage + processes + top
+
+
+IMPORTANT MAC COMMAND DIFFERENCES:
+
+Linux:
+lscpu
+
+Mac:
+sysctl -a | grep machdep.cpu
+
+
+Linux:
+lsblk
+
+Mac:
+diskutil list
+
+
+============================================================
+END
+============================================================
