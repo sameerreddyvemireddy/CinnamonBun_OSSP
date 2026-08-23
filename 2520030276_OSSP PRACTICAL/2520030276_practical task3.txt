@@ -1,0 +1,332 @@
+OSSP PRACTICAL - EXPERIMENT 2
+
+TITLE:
+CREATION OF PARENT AND CHILD PROCESS USING fork() AND OBSERVATION OF PROCESS STATES
+
+AIM:
+To develop a C program using fork() to create a parent and child process, display their Process ID (PID) and Parent Process ID (PPID), and observe process states using ps and top on macOS Terminal.
+
+NOTE:
+The assignment mentions Linux tools ps, top, and /proc. On macOS, ps and top are available, but the Linux /proc filesystem is not available. Therefore, this experiment uses ps and top on Mac. The /proc observation is shown separately as a Linux-only step.
+
+REQUIREMENTS:
+1. Mac computer
+2. Terminal
+3. GCC compiler
+4. C program file: process.c
+
+STEP 1: OPEN TERMINAL
+1. Press Command + Space.
+2. Type Terminal.
+3. Press Enter.
+
+STEP 2: CREATE THE OSSP FOLDER
+Type:
+mkdir -p ~/OSSP
+Then:
+cd ~/OSSP
+Check:
+pwd
+
+STEP 3: CREATE THE C PROGRAM
+Type:
+nano process.c
+
+Paste:
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/wait.h>
+
+int main()
+{
+    pid_t pid;
+
+    printf("Program started\n");
+    printf("PID before fork = %d\n", getpid());
+
+    pid = fork();
+
+    if (pid < 0)
+    {
+        printf("Fork failed\n");
+        return 1;
+    }
+
+    else if (pid == 0)
+    {
+        printf("\n--- CHILD PROCESS ---\n");
+        printf("Child PID  = %d\n", getpid());
+        printf("Child PPID = %d\n", getppid());
+        printf("Child State = RUNNING\n");
+
+        printf("Child is sleeping...\n");
+        sleep(30);
+
+        printf("Child State = RUNNING\n");
+        printf("Child is terminating...\n");
+    }
+
+    else
+    {
+        printf("\n--- PARENT PROCESS ---\n");
+        printf("Parent PID = %d\n", getpid());
+        printf("Parent PPID = %d\n", getppid());
+        printf("Child PID = %d\n", pid);
+
+        printf("Parent State = RUNNING\n");
+        printf("Parent is WAITING for child...\n");
+
+        wait(NULL);
+
+        printf("Child has terminated.\n");
+        printf("Parent State = RUNNING\n");
+        printf("Parent is terminating...\n");
+    }
+
+    return 0;
+}
+
+STEP 4: SAVE THE PROGRAM
+Press Control + O.
+Press Enter.
+Press Control + X.
+
+STEP 5: COMPILE
+Type:
+gcc process.c -o process
+
+If no error appears, compilation is successful.
+
+STEP 6: RUN
+Type:
+./process
+
+EXPECTED OUTPUT:
+Program started
+PID before fork = 12345
+
+--- PARENT PROCESS ---
+Parent PID = 12345
+Parent PPID = 12000
+Child PID = 12346
+Parent State = RUNNING
+Parent is WAITING for child...
+
+--- CHILD PROCESS ---
+Child PID  = 12346
+Child PPID = 12345
+Child State = RUNNING
+Child is sleeping...
+
+After about 30 seconds:
+Child State = RUNNING
+Child is terminating...
+Child has terminated.
+Parent State = RUNNING
+Parent is terminating...
+
+Note: Your PID numbers will be different.
+
+STEP 7: RUN THE PROGRAM IN BACKGROUND
+Make sure you are in the OSSP folder:
+cd ~/OSSP
+
+Then:
+./process &
+
+IMPORTANT:
+Do NOT type sleep(30); or wait(NULL); in Terminal. These are C statements already inside process.c.
+
+STEP 8: OPEN A SECOND TERMINAL
+Keep the first Terminal open.
+Press Command + Space, type Terminal, and press Enter.
+
+STEP 9: CHECK THE PROCESSES
+In the second Terminal type:
+ps -ax -o pid,ppid,state,command | grep './process'
+
+Example:
+30298 30090 SN ./process
+30299 30298 SN ./process
+
+Interpretation:
+Parent PID = 30298
+Parent PPID = 30090
+
+Child PID = 30299
+Child PPID = 30298
+
+The important point is:
+Child PPID = Parent PID
+
+This confirms that fork() created the child process.
+
+On macOS, S means sleeping. The N flag is an additional priority/nice-related flag. For this experiment, focus on S = sleeping.
+
+STEP 10: OBSERVE USING ps
+If the PIDs are 30298 and 30299, type:
+ps -p 30298,30299 -o pid,ppid,state,command
+
+Expected:
+PID    PPID    STAT    COMMAND
+30298  30090   SN      ./process
+30299  30298   SN      ./process
+
+Use your actual PID numbers, not the example numbers.
+
+STEP 11: OBSERVE USING top
+Type:
+top
+
+Find ./process in the list.
+top shows running processes and CPU activity.
+Press q to exit top.
+
+STEP 12: OBSERVE WAITING/SLEEPING
+The child program contains:
+sleep(30);
+
+So the child sleeps for about 30 seconds.
+
+The parent contains:
+wait(NULL);
+
+So the parent waits for the child to finish.
+
+During this time, use:
+ps -ax -o pid,ppid,state,command | grep './process'
+
+STEP 13: OBSERVE TERMINATION
+After about 30 seconds:
+1. The child finishes.
+2. The child terminates.
+3. The parent resumes after wait(NULL).
+4. The parent prints that the child has terminated.
+5. The parent terminates.
+
+Run:
+ps -ax -o pid,ppid,state,command | grep './process'
+
+again after the program finishes. The ./process entries should no longer be present.
+
+STEP 14: /proc - LINUX ONLY
+macOS does not have the Linux /proc filesystem.
+
+On Ubuntu/Linux, if the PID is 30298:
+cat /proc/30298/status
+
+It may show:
+Name: process
+State: S (sleeping)
+Pid: 30298
+PPid: 30090
+
+On Mac, use:
+ps -p 30298 -o pid,ppid,state,command
+
+PROCESS STATE OBSERVATION
+
+READY:
+The process is ready to execute and waiting for CPU scheduling. The exact Ready state is not separately displayed by macOS ps.
+
+RUNNING:
+The process is actively executing on the CPU. The program displays RUNNING while it is executing.
+
+WAITING/SLEEPING:
+The child sleeps because of sleep(30). The parent waits because of wait(NULL). On macOS, S represents sleeping.
+
+TERMINATED:
+After execution, the child terminates. Then the parent resumes and eventually terminates.
+
+PROCESS STATE FLOW:
+
+READY
+  |
+  v
+RUNNING
+  |
+  v
+WAITING / SLEEPING
+  |
+  v
+RUNNING
+  |
+  v
+TERMINATED
+
+OBSERVATION TABLE:
+
+Stage 1:
+Program starts.
+State: Running/Ready.
+Observation: Process starts executing.
+
+Stage 2:
+fork() is executed.
+Observation: Parent and child processes are created.
+
+Stage 3:
+Child executes sleep(30).
+State: Sleeping/Waiting.
+Observation: ps may show S.
+
+Stage 4:
+Parent executes wait(NULL).
+State: Waiting.
+Observation: Parent waits for child.
+
+Stage 5:
+Child finishes.
+State: Terminated.
+Observation: Child disappears from process list.
+
+Stage 6:
+Parent resumes after wait().
+State: Running.
+Observation: Parent prints that child has terminated.
+
+Stage 7:
+Parent finishes.
+State: Terminated.
+Observation: Parent disappears from process list.
+
+OBSERVATION TO WRITE IN RECORD:
+
+1. The fork() system call successfully created a child process.
+2. The parent and child processes had different PIDs.
+3. The child PPID was equal to the parent PID.
+4. The child entered the sleeping/waiting state when sleep(30) was executed.
+5. The parent entered the waiting state when wait(NULL) was executed.
+6. The ps command was used to observe PID, PPID and process state.
+7. The top command was used to monitor the processes.
+8. After completing execution, the child process terminated.
+9. The parent resumed execution after the child terminated.
+10. Finally, the parent process also terminated.
+11. The /proc/PID/status method is Linux-only and is not available on macOS.
+12. Therefore, ps and top were used on macOS to observe the processes.
+
+RESULT:
+
+Thus, the C program using fork() was executed successfully. A parent and child process were created, and their PID and PPID were displayed. The Running, Waiting/Sleeping, and Terminated states were observed using ps and top on macOS. The Linux /proc method was also studied and its limitation on macOS was identified.
+
+QUICK COMMANDS:
+
+cd ~/OSSP
+nano process.c
+gcc process.c -o process
+./process
+./process &
+ps -ax -o pid,ppid,state,command | grep './process'
+ps -p PID1,PID2 -o pid,ppid,state,command
+top
+
+Press q to exit top.
+
+IMPORTANT:
+Do not type these directly into Terminal:
+sleep(30);
+wait(NULL);
+
+They are C statements inside the program.
